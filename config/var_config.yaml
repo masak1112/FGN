@@ -1,0 +1,90 @@
+# Zarr output specification for WeatherNext2.
+#
+# This file defines *what* gets stored and *how*: which model variables are saved, the
+# units they carry, how each is aggregated in time, and the on-disk encoding.
+#
+# Aggregations
+# ------------
+#   native      every 6-hourly step, on `prediction_timedelta`
+#   daily_mean  mean of the four 6-hourly values in a UTC calendar day
+#   daily_min   minimum of those four
+#   daily_max   maximum of those four
+#   daily_sum   sum of those four (for per-step accumulations such as tp)
+#
+# All daily aggregations land on `prediction_timedelta_daily`. A UTC calendar day owns the
+# four steps valid at 06/12/18 UTC of that date and 00 UTC of the next, so a step valid at
+# t covers (t-6h, t]. Incomplete days at the forecast edges are dropped.
+#
+# NOTE on daily_min/daily_max: these are extremes of the four 6-hourly *samples*, not the
+# true daily extremes, which would need hourly output the model does not produce. For 2t
+# in particular the sampled minimum will usually be warmer than the real overnight low.
+#
+# Output naming
+# -------------
+# A variable listing a single aggregation keeps its bare name (so the store matches the
+# reference archive). A variable listing several gets one output per aggregation, suffixed
+# `_mean` / `_min` / `_max` / `_sum`; `native` never takes a suffix. For example
+#
+#   2t: {units: K, aggregations: [native, daily_min, daily_max]}
+#
+# produces `2t` (6-hourly), `2t_min` and `2t_max` (daily). Every output records its
+# aggregation in the variable attributes.
+
+variables:
+  # --- 6-hourly ---------------------------------------------------------------
+  2t:     {units: K,             aggregations: [native]}
+  sst:    {units: K,             aggregations: [native]}
+  msl:    {units: Pa,            aggregations: [native]}
+  q_850:  {units: kg kg**-1,     aggregations: [native]}
+  q_925:  {units: kg kg**-1,     aggregations: [native]}
+  q_1000: {units: kg kg**-1,     aggregations: [native]}
+  t_850:  {units: K,             aggregations: [native]}
+  t_925:  {units: K,             aggregations: [native]}
+  t_1000: {units: K,             aggregations: [native]}
+
+  # --- daily means ------------------------------------------------------------
+  u_50:   {units: m s**-1,       aggregations: [daily_mean]}
+  v_50:   {units: m s**-1,       aggregations: [daily_mean]}
+  u_200:  {units: m s**-1,       aggregations: [daily_mean]}
+  v_200:  {units: m s**-1,       aggregations: [daily_mean]}
+  u_850:  {units: m s**-1,       aggregations: [daily_mean]}
+  v_850:  {units: m s**-1,       aggregations: [daily_mean]}
+  z_200:  {units: m**2 s**-2,    aggregations: [daily_mean]}
+  z_500:  {units: m**2 s**-2,    aggregations: [daily_mean]}
+  z_850:  {units: m**2 s**-2,    aggregations: [daily_mean]}
+
+  # --- daily accumulation -----------------------------------------------------
+  tp:     {units: m,             aggregations: [daily_sum]}
+
+# On-disk encoding. Every key is optional; anything omitted falls back to the defaults in
+# aifs_mps/config.py, which are the AIFS archive's layout.
+encoding:
+  # Inner chunks: the unit of a partial read.
+  chunks:
+    time: 1
+    number: 1
+    prediction_timedelta: 24
+    prediction_timedelta_daily: 10
+    lat: 90
+    lon: 180
+  # Shards: the unit of an on-disk write. Must be a positive multiple of the chunk shape
+  # on every dimension. `number: 1` is what lets ensemble members be written independently.
+  shards:
+    time: 1
+    number: 1
+    prediction_timedelta: 168
+    prediction_timedelta_daily: 50
+    lat: 720
+    lon: 1440
+  compressor:
+    cname: zstd
+    clevel: 7
+    shuffle: bitshuffle
+  # Lossy precision reduction: BitRound keeps the top `keepbits` mantissa bits of each
+  # float32 (dtype stays float32), zeroing incompressible inference noise so zstd packs
+  # far tighter. Relative error per value is ~2**-keepbits (11 -> ~0.05%, 9 -> ~0.2%,
+  # 7 -> ~0.8%). Set to null to store exact float32.
+  keepbits: null
+  # Per-variable overrides, e.g. more bits for noisy fields:
+  #   keepbits_by_variable: {tp: 13}
+  keepbits_by_variable: {}
