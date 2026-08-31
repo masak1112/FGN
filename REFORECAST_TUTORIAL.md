@@ -42,10 +42,11 @@ command is always safe.
 
 ## Step 1 (all users)
 
-1. **SSH into Stampede3** and navigate to the project directory:
+1. **SSH into Stampede3** and navigate to the project directory and activate the env 
 
    ```bash
    cd /scratch/10786/bgong1/FGN
+   conda activate /scratch/10786/bgong1/FGN_env
    ```
 
 ## Step 2: Submit Your 3 Jobs
