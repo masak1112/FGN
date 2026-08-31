@@ -46,7 +46,7 @@ command is always safe.
 
    ```bash
    cd /scratch/10786/bgong1/FGN
-   conda activate /scratch/10786/bgong1/FGN_env
+   source /scratch/10786/bgong1/FGN_env/bin/activate
    ```
 
 ## Step 2: Submit Your 3 Jobs
