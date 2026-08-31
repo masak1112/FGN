@@ -273,7 +273,7 @@ class ForwardPass(hk.Module):
     # LatLonPointsData(main=updated, norm_conditioning=encoded or None)
     # -> xarray.Dataset, LatLonGridData(main=updated, norm_conditioning=same).
     predictions = self._decode_lat_lon_grid_data_from_mesh(
-        targets_template=xr.Dataset(targets_template),
+        targets_template=targets_template.copy() if isinstance(targets_template, xr.Dataset) else xr.Dataset(targets_template),
         latent_mesh_data=latent_mesh_data,
         encoded_grid_points_residual=lat_lon_points_latent,
         grid_data_template=latent_grid_data,
@@ -281,7 +281,7 @@ class ForwardPass(hk.Module):
         is_training=is_training,
     )
 
-    predictions = xr.Dataset(predictions)
+    predictions = predictions.copy() if isinstance(predictions, xr.Dataset) else xr.Dataset(predictions)
     for var, activation_fn in self._per_var_activation_fns.items():
       predictions[var] = xarray_jax.apply_ufunc(activation_fn, predictions[var])
 

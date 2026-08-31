@@ -357,15 +357,16 @@ def build_sbatch(cfg, run_dir: pathlib.Path, n_jobs: int, concurrent, time_limit
         f"#SBATCH --partition={r.partition}",
         f"#SBATCH --array={array}",
         f"#SBATCH --nodes={r.nodes_per_job}",
-        "#SBATCH --ntasks=1",
+        f"#SBATCH -n {r.gpu_per_job}",
         f"#SBATCH --cpus-per-task={r.cpu_per_task}",
-        f"#SBATCH --gres={r.gres}",
         f"#SBATCH --mem={r.mem_per_job}",
         f"#SBATCH --time={time_limit}",
         # stderr is merged into this file; %A is the array job id, %a the task.
         f"#SBATCH --output={run_dir}/slurm/task_%a.job_%A.out",
         "#SBATCH --open-mode=append",
     ]
+    if r.allocation:
+        directives.append(f"#SBATCH --account={r.allocation}")
     if r.exclude_nodes:
         directives.append(f"#SBATCH --exclude={r.exclude_nodes}")
 
@@ -376,10 +377,16 @@ def build_sbatch(cfg, run_dir: pathlib.Path, n_jobs: int, concurrent, time_limit
     )
     body = textwrap.dedent(
         f"""
-        set -euo pipefail
+        set -eo pipefail
 
         cd {PROJECT_DIR}
-        source ./.venv/bin/activate
+        module load gcc/15.1.0 nvidia/25.3 opencilk/2.1.0
+        module load cuda/12.8
+        set +u
+        conda activate /scratch/10786/bgong1/FGN_env
+        set -u
+        export LD_LIBRARY_PATH=/scratch/10786/bgong1/FGN_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:/scratch/10786/bgong1/FGN_env/lib/python3.12/site-packages/nvidia/cusparse/lib:/scratch/10786/bgong1/FGN_env/lib/python3.12/site-packages/nvidia/cublas/lib:/scratch/10786/bgong1/FGN_env/lib/python3.12/site-packages/nvidia/cudnn/lib:/scratch/10786/bgong1/FGN_env/lib/python3.12/site-packages/nvidia/cufft/lib:/scratch/10786/bgong1/FGN_env/lib/python3.12/site-packages/nvidia/cusolver/lib:/scratch/10786/bgong1/FGN_env/lib/python3.12/site-packages/nvidia/nccl/lib:$LD_LIBRARY_PATH
+        
         {umask}
         task=$(printf '%03d' "$SLURM_ARRAY_TASK_ID")
         dates_file={run_dir}/dates/task_${{task}}.txt

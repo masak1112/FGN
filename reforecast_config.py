@@ -71,6 +71,7 @@ class Resources:
     cpu_per_task: int = 16
     mem_per_job: str = "256GB"
     partition: str = "general"
+    allocation: str | None = None
     time_limit: str = "12:00:00"
     exclude_nodes: str | None = None
     log_dir: str = "./logs/reforecast"
