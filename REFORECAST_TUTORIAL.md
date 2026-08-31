@@ -40,7 +40,7 @@ command is always safe.
 
 ---
 
-## Prerequisites (all users)
+## Step 1 (all users)
 
 1. **SSH into Stampede3** and navigate to the project directory:
 
@@ -134,7 +134,40 @@ python submit_reforecast.py --config reforecast_config_stampede3.yaml \
 
 ---
 
-## Step 3: Resubmit Every ~24 Hours
+## Step 3: Monitor Progress
+
+Check your jobs in the queue:
+
+```bash
+squeue -u $USER
+```
+
+Check how many dates are done vs pending for your year range:
+
+```bash
+python submit_reforecast.py \
+    --config reforecast_config_stampede3.yaml \
+    --years FIRST LAST
+```
+
+Look at the `published` and `pending` counts in the output.
+
+Check logs for a running job:
+
+```bash
+# List your run directories (most recent last)
+ls -lt logs/reforecast/
+
+# Tail the Slurm output of a running task
+tail -f logs/reforecast/<run_dir>/slurm/task_0.job_<jobid>.out
+
+# Check per-date timing
+tail -5 logs/reforecast/<run_dir>/tasks/task_000/<YYYY-MM-DD>T00/perf.log
+```
+
+---
+
+## Step 4: Resubmit Every ~24 Hours
 
 After each wave completes, simply **re-run the same 3 submit commands** for
 your year range. The script detects already-published dates and only queues the
