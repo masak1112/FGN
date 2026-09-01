@@ -31,11 +31,11 @@ command is always safe.
 | User | Years | Num years | Dates | Waves | Est. days |
 |------|-------|-----------|-------|-------|-----------|
 | Bo (User 1) | 2000–2003 | 4 | 364 | 13 | ~26 days |
-| Rajat (User 2) | 2004–2007 | 4 | 364 | 13 | ~26 days |
+| Katie (User 2) | 2004–2007 | 4 | 364 | 13 | ~26 days |
 | Christ (User 3) | 2008–2011 | 4 | 364 | 13 | ~26 days |
 | Anustup (User 4) | 2012–2016 | 5 | 455 | 16 | ~32 days |
 | Aryan Kaushal (User 5) | 2017–2020 | 4 | 364 | 13 | ~26 days |
-| Bing Gong (User 6) | 2021–2025 | 5 | 455 | 16 | ~32 days |
+| Panchali (User 6) | 2024–2025 | 2 | 182 | 6 | ~13 days |
 
 
 ---
@@ -68,7 +68,7 @@ python submit_reforecast.py --config reforecast_config_stampede3.yaml \
     --years 2003 2003 --force --submit
 ```
 
-### Rajat (2004–2007)
+### Katie (2004–2007)
 
 ```bash
 python submit_reforecast.py --config reforecast_config_stampede3.yaml \
@@ -120,14 +120,15 @@ python submit_reforecast.py --config reforecast_config_stampede3.yaml \
     --years 2020 2020 --force --submit
 ```
 
-### Bing Gong (2021–2025)
+
+
+
+### Panchali (2024–2025)
 
 ```bash
 python submit_reforecast.py --config reforecast_config_stampede3.yaml \
-    --years 2021 2022 --force --submit
+    --years 2024 2024 --force --submit
 
-python submit_reforecast.py --config reforecast_config_stampede3.yaml \
-    --years 2023 2024 --force --submit
 
 python submit_reforecast.py --config reforecast_config_stampede3.yaml \
     --years 2025 2025 --force --submit
