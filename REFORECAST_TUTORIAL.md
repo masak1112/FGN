@@ -107,7 +107,7 @@ python submit_reforecast.py --config reforecast_config_stampede3.yaml \
     --years 2016 2016 --force --submit
 ```
 
-### Aryan Kaushal (2017–2020)
+### Aryan Kaushal (2017–2019)
 
 ```bash
 python submit_reforecast.py --config reforecast_config_stampede3.yaml \
