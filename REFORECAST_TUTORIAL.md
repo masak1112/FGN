@@ -34,9 +34,9 @@ command is always safe.
 | Katie (User 2) | 2004–2007 | 4 | 364 | 13 | ~26 days |
 | Christ (User 3) | 2008–2011 | 4 | 364 | 13 | ~26 days |
 | Anustup (User 4) | 2012–2016 | 5 | 455 | 16 | ~32 days |
-| Aryan Kaushal (User 5) | 2017–2020 | 4 | 364 | 13 | ~26 days |
-| Panchali (User 6) | 2024–2025 | 2 | 182 | 6 | ~13 days |
-
+| Aryan Kaushal (User 5) | 2017–2019 | 4 | 364 | 13 | ~26 days |
+| Bing Gong (User 6) | 2020–2023 | 4 | 364 | 13 | ~26 days |
+| Panchali (User 7) | 2024–2025 | 2 | 182 | 6 | ~13 days |
 
 ---
 
@@ -116,8 +116,6 @@ python submit_reforecast.py --config reforecast_config_stampede3.yaml \
 python submit_reforecast.py --config reforecast_config_stampede3.yaml \
     --years 2019 2019 --force --submit
 
-python submit_reforecast.py --config reforecast_config_stampede3.yaml \
-    --years 2020 2020 --force --submit
 ```
 
 
